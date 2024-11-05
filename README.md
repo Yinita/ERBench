@@ -1,67 +1,67 @@
 # ERBench
-## Binary Tasks
-### How to Run
+## 二元任务
+### 如何运行
 #### binary/run_qa.py
-- Description
+- 描述
     
-    This python file triggers the data preprocessing steps using the data in the in the {task}_data/crafted folders and runs the models (GPT, Gemini, Llama, Mistral, Claude). The output of the program will be saved under the results folder.
+    该Python文件通过{task}_data/crafted文件夹中的数据触发数据预处理步骤并运行模型（GPT、Gemini、Llama、Mistral、Claude）。程序输出将保存在results文件夹下。
 
-- Arguments
+- 参数
     - task
         
-        the dataset that one ought to test
+        要测试的数据集
     - tasktype
 
-        validation step or the main test step
+        验证步骤或主要测试步骤
     - index
     
-        LLM APIs tend to abort their program due to various issues such as timeout errors or sensitive content errors. Then the user should add the corresponding index to the code to skip the index. After that give the corresponding index as the parameter such that the model can continue its testing from the index
+        大语言模型（LLM）API可能会因为超时或敏感内容错误等问题中止程序。用户可以将对应的索引添加到代码中以跳过该索引，并在模型参数中提供该索引以继续测试。
     - demo
         
-        Used for few-shot (parameter value: demo) or Chain-of-Thought Prompting (parameter value: cot)
+        用于Few-shot（参数值：demo）或链式思维提示（参数值：cot）
     - rag
     
-        Used for Retrieval Augmented Generation (Wikipedia), if wanting to enable RAG, give True as the parameter value
+        用于检索增强生成（Wikipedia），若希望启用RAG，请将参数值设置为True
     - model
     
-        the model that one ought to test 
+        要测试的模型
 
 #### binary/error_analysis.py
 
-This python file returns the numerical analyses results based on the output log files outputted by run_qa.py.  Four lines of output will be shown in the terminal, each corresponding to A, R, AR, H. The first numeric result for each row is the value for the basic prompt and the second result is the value for the negated prompt.
+此Python文件基于run_qa.py的输出日志文件返回数值分析结果。终端将显示四行输出，每行对应A、R、AR、H。每行的第一个数值为基础提示的值，第二个数值为反向提示的值。
 
-- Arguments
+- 参数
     - task
         
-        the dataset that one ought to test
+        要测试的数据集
     - demo
     
-        Used for few-shot (parameter value: demo) or Chain-of-Thought Prompting (parameter value: cot)
+        用于Few-shot（参数值：demo）或链式思维提示（参数值：cot）
     - model
     
-        the model that one ought to test 
+        要测试的模型
     - rag
     
-        Used for Retrieval Augmented Generation (Wikipedia), if wanting to enable RAG, give True as the parameter value
+        用于检索增强生成（Wikipedia），若希望启用RAG，请将参数值设置为True
 
 #### binary/finetune_dataset.py
-This python file creates the dataset needed for finetuning for GPT models.
-- Arguments
+此Python文件创建GPT模型微调所需的数据集。
+- 参数
     - n
     
-        the number of data points that one ought to use
+        要使用的数据点数量
     
-    If the user wants to modify the datasets that will be used for finetuning, change line 313 datasets parameter.
+    若用户希望修改用于微调的数据集，请更改第313行的datasets参数。
 
 #### finetune.ipynb
-This python file executes finetuning based on the dataset created by finetune_dataset.py.
+此Python文件基于finetune_dataset.py创建的数据集执行微调。
 
 #### correctness_ver.py
-This python file verifies the correctness of ERBench compared to human analyses and GPT-Judge. Note that some values are omiotted in the paper due to small sample size (less than 4) and entity resolution problems were dealt manually.
+此Python文件验证ERBench的正确性，并与人工分析和GPT-Judge进行比较。请注意，由于样本量较小（小于4），某些值在论文中被省略，实体解析问题则通过手动处理。
 
-### Experiment Procedure
+### 实验流程
 
-#### General Tasks
+#### 一般任务
 ```
 python run_qa.py --model [MODEL] --task [TASK] --tasktype validate
 python run_qa.py --model [MODEL] --task [TASK]
@@ -69,153 +69,149 @@ python error_analysis.py --model [MODEL] --task [TASK]
 python correctness_ver.py --model [MODEL] --task [TASK]
 ```
 
-#### Finetuning
+#### 微调
 ```
 python finetune_dataset.py --n [N]
-run finetune.ipynb via ipynb kernel
+运行 finetune.ipynb via ipynb kernel
 python run_qa.py --model [FINETUNED_MODEL] --task [TASK] --tasktype validate
 python run_qa.py --model [FINETUNED_MODEL] --task [TASK]
 python error_analysis.py --model [FINETUNED_MODEL] --task [TASK]
 ```
-finetune_dataset.py -> finetune.ipynb -> run_qa.py -> error_analysis.py
+流程：finetune_dataset.py -> finetune.ipynb -> run_qa.py -> error_analysis.py
 
-### Images for Multimodal Models (Gemini Vision Pro)
+### 多模态模型的图像任务（如Gemini Vision Pro）
 
-https://drive.google.com/drive/folders/1WXCGCG4ZPzkV1qUjR2Z0IegzkPgSSKwl?usp=drive_link 
-
+图片链接：[多模态任务图片](https://drive.google.com/drive/folders/1WXCGCG4ZPzkV1qUjR2Z0IegzkPgSSKwl?usp=drive_link)
 
 ---
 
+## 多选题（MC）任务
 
-## Multi-choice (MC) Tasks
+> ### 如何使用数据库生成多选题模板
 
-> ### How to generate MC question templates with your DB
-
-(1) Prepare your FD based on your DB schema
+(1) 基于数据库结构准备FD
     
-*movie title, released year* $\rightarrow$ *director, length, movie publisher*
+*电影标题，发行年份* $\rightarrow$ *导演，时长，电影发行公司*
 
-(2) Generate your question and corresponding options
+(2) 生成问题和对应的选项
 
-- Include left-hand side attribute values in the question
+- 将左侧属性值包含在问题中
 
-    ```What is the false option about the movie {movie title} released in {year}? Provide an explanation.```
+    ```关于{movie title}这部于{year}年发行的电影，以下哪个选项是错误的？请提供解释。```
 
-- Convert each right-hand side attribute value to each option
+- 将每个右侧属性值转化为各个选项
 
-    ```Option A: It was directed by {director}.```
+    ```选项A：该片由{director}导演。```
 
-    ```Option B: The runtime of the movie is {length} minutes.```
+    ```选项B：影片时长为{length}分钟。```
 
-    ```Option C: The production company of this movie is {movie publisher}.```
+    ```选项C：该片由{movie publisher}出品。```
 
-- Note that one of your options will be using a **FALSE** attribute value (e.g., different director name), which makes the option as the answer of this MC question. Please refer to *run_qa* function in run_qa.py. 
+- 请注意，其中一个选项将使用**错误**的属性值（例如错误的导演姓名），这个选项即为该多选题的正确答案。请参考run_qa.py中的*run_qa*函数。
 
-> ### How to run
+> ### 如何运行
 #### (1) multi_choice/source/run_qa.py
-- Description
+- 描述
 
-    This python file (1) preprocess dataset and (2) run QA/validation task.
+    此Python文件 (1) 预处理数据集和 (2) 运行问答/验证任务。
     
-    (1) preprocessing 
+    (1) 预处理 
 
-     Use dataset/crafted to reproduce the results in the paper. You should define your preprocessing function if you want to use your own database.
+     使用dataset/crafted来重现论文中的结果。如果希望使用自有数据库，请定义预处理函数。
 
-    (2) running tasks
+    (2) 运行任务
         
-    - QA
+    - 问答
 
-        Run main QA tasks with LLMs. The output of the program (log file) will be saved under the results folder.
+        使用LLMs运行主要问答任务。程序的输出（日志文件）将保存在results文件夹下。
 
-        For example,
+        示例：
 
         ```python run_qa.py --task movie --model gpt35 --tasktype multiqa```
 
-    - Validation
+    - 验证
     
-        Run validation tasks with LLMs. The output of the program (log file) will be saved under dataset/validated folder. 
+        使用LLMs运行验证任务。程序的输出（日志文件）将保存在dataset/validated文件夹下。
 
-        For example,
+        示例：
 
         ```python run_qa.py –task movie –model gpt35 –tasktype validate```
-- Argument
+
+- 参数
     -	task
         
-        choose dataset (movie/soccer/airport/music/book)
+        选择数据集（movie/soccer/airport/music/book）
     -	tasktype
         
-        choose QA or validation task (multiqa/validate)
+        选择问答或验证任务（multiqa/validate）
     -	index
     
-        entity id to resume code. This is useful when API for LLM fail during the code. When specified, skip the entities before the given index.
+        实体ID以恢复代码。在代码运行失败时，指定索引以跳过之前的实体。
     -	mixed
     
-        [0, 1) proportion to mix questions of None-of-above type and normal type. For example, 0.2 means 20% question is None-of-above type.
+        [0, 1)区间，用于设置“皆非选项”与正常选项的问题比例。例如，0.2表示20%的问题为“皆非选项”类型。
     -	random_seed
     
-        random seed to reproduce results.
+        随机种子以重现结果
     -	model
     
-        choose model (gpt35/gpt4/mistral/llama/gemini/claude/gemini_v/gpt_v)
+        选择模型（gpt35/gpt4/mistral/llama/gemini/claude/gemini_v/gpt_v）
     -	rag
     
-        run QA with knowledge augmentation (RAG). Before running code with RAG mode, you should run your normal type QA first. 
+        使用知识增强（RAG）运行问答。运行RAG模式前，需先运行普通类型问答。
     -	demo
     
-        run QA with few-shot demonstrations. Before running code with demo mode, make sure you have demonstrations in dataset/demo.
+        使用Few-shot演示运行问答。在demo模式运行前，确保dataset/demo中有演示样例。
 	
 #### (2) multi_choice/source/error_analysis.py
--	Description
+-	描述
 
-    This python file must run after run_qa.py. This code (1) process validation log file to dataframe (.csv), (2) process QA log file to dataframe (.csv) and (2) analyze performance metrics w.r.t. these processed dataframes.
+    该Python文件需在run_qa.py运行后执行。此代码 (1) 处理验证日志文件并生成数据框（.csv），(2) 处理问答日志文件并生成数据框（.csv），(3) 根据处理后的数据框分析性能指标。
 
-    (1) Processing validation log file
+    (1) 处理验证日志文件
 
-    Make sure you have validation log file from run_qa.py. The output of the program (csv) will be saved under the dataset/validated folder.
+    确保已获得run_qa.py生成的验证日志文件。程序输出（csv文件）将保存在dataset/validated文件夹中。
 
-    (2)	Processing QA log file
+    (2)	处理问答日志文件
 
-    Make sure you have QA log file from run_qa.py. The output of the program (csv) will be saved under the results folder.
+    确保已获得run_qa.py生成的问答日志文件。程序输出（csv文件）将保存在results文件夹中。
 
-    (3)	Analyzing performances
+    (3)	分析性能
 
-    We provide 3 modes w.r.t. validation output when analyzing QA output: (a) consider all QA pairs (no validation) (b) consider QA pairs w.r.t. given LLM’s own valid entities (c) consider QA pairs w.r.t. all LLMs’ valid entities. We refer “valid entities” as “entities that LLM already knows”. Please refer to our paper for more details.
+    提供3种模式以分析问答输出的验证结果：(a) 所有问答对（无验证），(b) 仅考虑LLM已知的有效实体问答对，(c) 所有LLMs已知的有效实体问答对。我们将“有效实体”定义为“LLM已知的实体”。详情参见论文。
 
     ```
-    python error_anlaysis.py --task movie --model gpt35 # get type (a), (b), (c) at once 
-    python error_anlaysis.py --task movie --model gpt35 --only_val # get type (b) only
-    python error_anlaysis.py --task movie --model gpt35 --only_common # get type (c) only
+    python error_anlaysis.py --task movie --model gpt35 # 同时生成(a)、(b)、(c)类型结果
+    python error_anlaysis.py --task movie --model gpt35 --only_val # 仅生成(b)类型结果
+    python error_anlaysis.py --task movie --model gpt35 --only_common # 仅生成(c)类型结果
     ```
 
--	Arguments
+-	参数
     -   task
     
-        choose dataset (movie/soccer/airport/music/book)
+        选择数据集（movie/soccer/airport/music/book）
     -	mixed
     
-        [0, 1) proportion to mix questions of None-of-above type and normal type. For example, 0.2 means 20% question is None-of-above type.
+        [0, 1)区间，用于设置“皆非选项”与正常选项的问题比例。例如，0.2表示20%的问题为“皆非选项”类型。
     -	model
     
-        choose model (gpt35/gpt4/mistral/llama/gemini/gemini_v)
+        选择模型（gpt35/gpt4/mistral/llama/gemini/gemini_v）
     -	rag
     
-        run QA with knowledge augmentation (RAG). Before running code with RAG mode, you should run your normal type QA first. 
+        使用知识增强（RAG）运行问答。运行RAG模式前，需先运行普通类型问答。
     -	demo
         
-        run QA with few-shot demonstrations. Before running code with demo mode, make sure you have demonstrations in dataset/demo.
+        使用Few-shot演示运行问答。在demo模式运行前，确保dataset/demo中有演示样例。
     -	only_val
     
-        save only type (2) analysis results.
+        仅保存(b)类型分析结果。
     -	only_common
     
-        save only type (3) analysis results.
+        仅保存(c)类型分析结果。
 
-> ### Experiment Procedure
+> ### 实验流程
 ```
 python run_qa.py --model [MODEL] --task [TASK] --tasktype validate
 python run_qa.py --model [MODEL] --task [TASK]
 python error_analysis.py --model [MODEL] --task [TASK]
 ```
-
-
-
