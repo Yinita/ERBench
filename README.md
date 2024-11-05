@@ -72,7 +72,7 @@ python correctness_ver.py --model [MODEL] --task [TASK]
 #### 微调
 ```
 python finetune_dataset.py --n [N]
-运行 finetune.ipynb via ipynb kernel
+run finetune.ipynb via ipynb kernel
 python run_qa.py --model [FINETUNED_MODEL] --task [TASK] --tasktype validate
 python run_qa.py --model [FINETUNED_MODEL] --task [TASK]
 python error_analysis.py --model [FINETUNED_MODEL] --task [TASK]
